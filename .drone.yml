@@ -1,0 +1,43 @@
+build:
+  install:
+    image: golang
+    pull: true
+    commands:
+      - make install
+      - make lint
+      - make test
+    when:
+      branch: "master"
+
+  pull-request:
+    image: golang
+    pull: true
+    commands:
+      - make install
+      - make lint
+      - make test
+    when:
+      event: "pull_request"
+
+  tag:
+    image: $$DOCKER_REG/drone/bumpit
+    pull: true
+    environment:
+     DRONE_DSN: $$DRONE_DSN
+    commands:
+      - /opt/entrypoint.sh
+    when:
+      branch: ["master"]
+      success: true
+
+  run:
+    image: golang
+    pull: true
+    commands:
+      - go build
+      - $(pwd)/test-automation-lab
+    when:
+      branch: "master"
+      success: true
+
+
